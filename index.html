@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accordion Beispiel</title>
+    <title>Komponenten EQ</title>
     <style>
         .accordion {
             background-color: #f1f1f1;
@@ -35,12 +35,25 @@
 </head>
 <body>
 
-<h2>Accordion Beispiel</h2>
+<h2>Komponenten eines parametrischen EQs</h2>
 
-<button class="accordion">Klicke hier, um den Text anzuzeigen</button>
+<button class="accordion">Low Cut</button>
 <div class="panel">
     <p>Dies ist der ausgeklappte Text, der angezeigt wird, wenn du auf den Button klickst. Du kannst hier beliebigen Text einfügen.</p>
 </div>
+
+<button class="accordion">Bell</button>
+<div class="panel">
+    <p>Dies ist der ausgeklappte Text, der angezeigt wird, wenn du auf den Button klickst. Du kannst hier beliebigen Text einfügen.</p>
+</div>
+
+<button class="accordion">High Cut</button>
+<div class="panel">
+    <p>Dies ist der ausgeklappte Text, der angezeigt wird, wenn du auf den Button klickst. Du kannst hier beliebigen Text einfügen.</p>
+</div>
+
+
+
 
 <script>
     const accordions = document.querySelectorAll('.accordion');

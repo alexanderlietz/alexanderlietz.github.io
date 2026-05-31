@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8"/>
 <title>Was haben diese Bilder gemeinsam?</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
+/* ─── Tokens ─────────────────────────────────────────────── */
 :root {
   --bg:      #fdf4f0;
   --surface: #f5e0d8;
@@ -14,971 +15,824 @@
   --dark:    #1a0e0c;
   --muted:   #9c7269;
   --text:    #3b2420;
+  --bar-h:   88px;
 }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; overflow: hidden; font-family: 'Jost', sans-serif; background: var(--dark); }
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+html, body { height:100%; overflow:hidden; font-family:'Jost',sans-serif; background:var(--dark); color:var(--text); }
 
-/* ── SHELL ── */
-#shell {
-  display: flex;
-  height: 100vh;
-  width: 100vw;
-}
+/* ─── Shell ──────────────────────────────────────────────── */
+#shell { display:flex; height:100vh; width:100vw; }
 
-/* ── SIDEBAR ── */
+/* ─── Sidebar ────────────────────────────────────────────── */
 #sidebar {
-  width: 172px;
-  flex-shrink: 0;
-  background: var(--bg);
-  border-right: 1px solid var(--lt);
-  display: flex;
-  flex-direction: column;
-  padding: 1rem .75rem;
-  gap: .6rem;
-  overflow-y: auto;
+  width:170px; flex-shrink:0;
+  background:var(--bg); border-right:1px solid var(--lt);
+  display:flex; flex-direction:column;
+  padding:1rem .75rem; gap:.55rem; overflow-y:auto;
 }
 .sb-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: .68rem;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--muted);
-  padding-bottom: .5rem;
-  border-bottom: 1px solid var(--lt);
+  font-family:'Cormorant Garamond',serif;
+  font-size:.66rem; letter-spacing:.15em; text-transform:uppercase;
+  color:var(--muted); padding-bottom:.5rem; border-bottom:1px solid var(--lt);
+  flex-shrink:0;
 }
 .sb-hint {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: .85rem;
-  color: var(--muted);
-  text-align: center;
-  margin-top: .8rem;
-  line-height: 1.6;
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:.84rem; color:var(--muted); text-align:center;
+  margin-top:.8rem; line-height:1.65;
 }
-.sb-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: .25rem;
-  animation: fadeUp .4s ease both;
-}
-@keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
-.sb-thumb {
-  width: 100%;
-  aspect-ratio: 4/3;
-  object-fit: cover;
-  border-radius: 7px;
-  border: 2px solid var(--accent);
-}
-.sb-label {
-  font-size: .68rem;
-  color: var(--pop);
-  font-weight: 500;
-  text-align: center;
-  word-break: break-word;
-}
+.sb-item { display:flex; flex-direction:column; align-items:center; gap:.25rem; animation:fadeUp .4s ease both; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+.sb-thumb { width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:7px; border:2px solid var(--accent); }
+.sb-label { font-size:.67rem; color:var(--pop); font-weight:500; text-align:center; word-break:break-word; }
 
-/* ── MAIN COLUMN ── */
-#main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  position: relative;
-}
+/* ─── Main column ────────────────────────────────────────── */
+#main { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
 
-/* ── STAGE (image area) ── */
-#stage {
-  flex: 1;
-  position: relative;
-  overflow: hidden;
-  min-height: 0;
-}
+/* ─── Stage ──────────────────────────────────────────────── */
+#stage { flex:1; position:relative; overflow:hidden; min-height:0; background:var(--dark); }
 
-/* canvas fills stage via JS sizing */
-#cv {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: block;
-  image-rendering: pixelated;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: crisp-edges;
-}
+#cv { position:absolute; top:0; left:0; display:block; image-rendering:pixelated; image-rendering:crisp-edges; }
 
-/* ── OVERLAY TEXTS (on image) ── */
-#overlay-header {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  padding: 1.2rem 1.5rem .8rem;
-  background: linear-gradient(to bottom, rgba(26,14,12,.75), transparent);
-  pointer-events: none;
-  z-index: 5;
+/* header gradient overlay */
+#hdr {
+  position:absolute; top:0; left:0; right:0; z-index:5;
+  padding:1.1rem 1.4rem .7rem;
+  background:linear-gradient(to bottom,rgba(26,14,12,.78),transparent);
+  pointer-events:none;
 }
-#overlay-header h1 {
-  font-family: 'Cormorant Garamond', serif;
-  font-weight: 300;
-  color: #fdf4f0;
-  font-size: clamp(1.3rem, 2.5vw, 2rem);
-  letter-spacing: .07em;
-  text-shadow: 0 2px 10px rgba(0,0,0,.4);
+#hdr .sub { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:.82rem; color:rgba(253,244,240,.55); margin-bottom:.15rem; }
+#hdr h1   { font-family:'Cormorant Garamond',serif; font-weight:300; font-size:clamp(1.2rem,2.4vw,1.9rem); letter-spacing:.07em; color:#fdf4f0; text-shadow:0 2px 10px rgba(0,0,0,.45); line-height:1.1; }
+
+/* settings icon – top right */
+#btn-cfg {
+  position:absolute; top:12px; right:14px; z-index:10;
+  width:34px; height:34px; border-radius:50%;
+  background:rgba(253,244,240,.12); border:1px solid rgba(253,244,240,.2);
+  color:rgba(253,244,240,.7); font-size:.95rem;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:background .2s, color .2s;
 }
-#overlay-header .sub {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: .85rem;
-  color: rgba(253,244,240,.6);
-  margin-bottom: .2rem;
-}
-#status {
-  position: absolute;
-  bottom: 6px; left: 0; right: 0;
-  text-align: center;
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 1rem;
-  color: rgba(253,244,240,.8);
-  text-shadow: 0 1px 6px rgba(0,0,0,.6);
-  pointer-events: none;
-  z-index: 5;
-  padding: 0 1rem;
-}
+#btn-cfg:hover { background:rgba(253,244,240,.24); color:#fff; }
 
 /* drop zone */
-#dropzone {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  cursor: pointer;
-  z-index: 4;
-  background: rgba(253,244,240,.05);
-  transition: background .2s;
+#dz {
+  position:absolute; inset:0; z-index:4;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1rem;
+  cursor:pointer; background:rgba(253,244,240,.04); transition:background .2s;
 }
-#dropzone:hover { background: rgba(253,244,240,.1); }
-#dropzone.hidden { display: none; }
-#dropzone .dz-icon { font-size: 3rem; opacity: .35; }
-#dropzone .dz-txt {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.2rem;
-  color: rgba(253,244,240,.55);
-  text-align: center;
-  line-height: 1.6;
+#dz:hover { background:rgba(253,244,240,.09); }
+#dz.hidden { display:none; }
+#dz .dz-icon { font-size:3rem; opacity:.32; }
+#dz .dz-txt  { font-family:'Cormorant Garamond',serif; font-size:1.15rem; color:rgba(253,244,240,.52); text-align:center; line-height:1.65; }
+
+/* step indicator dots */
+#dots {
+  position:absolute; bottom:52px; left:50%; transform:translateX(-50%);
+  display:none; gap:7px; z-index:5; align-items:center;
+}
+#dots.visible { display:flex; }
+.dot {
+  width:8px; height:8px; border-radius:50%;
+  background:rgba(255,255,255,.25); border:1.5px solid rgba(255,255,255,.35);
+  transition:background .25s, border-color .25s, transform .2s;
+}
+.dot.done    { background:var(--lt); border-color:var(--lt); }
+.dot.current { background:#fff; border-color:#fff; transform:scale(1.25); }
+
+/* status text */
+#status {
+  position:absolute; bottom:28px; left:0; right:0; z-index:5;
+  text-align:center; pointer-events:none;
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:.95rem; color:rgba(253,244,240,.72);
+  text-shadow:0 1px 6px rgba(0,0,0,.6); padding:0 1rem;
 }
 
-/* timer ring */
-#timer {
-  position: absolute;
-  top: 12px; right: 14px;
-  width: 52px; height: 52px;
-  display: none;
-  z-index: 6;
-}
-#timer.on { display: block; }
-.t-bg  { fill:none; stroke:rgba(255,255,255,.2); stroke-width:4; }
-.t-arc {
-  fill:none; stroke:#fff; stroke-width:4; stroke-linecap:round;
-  stroke-dasharray: 138.2;
-  stroke-dashoffset: 0;
-  transform-origin: 26px 26px;
-  transform: rotate(-90deg);
-  transition: stroke-dashoffset 1s linear;
-}
-.t-num {
-  position:absolute; inset:0;
-  display:flex; align-items:center; justify-content:center;
-  font-family:'Cormorant Garamond',serif;
-  font-size:1.1rem; color:#fff; font-weight:600;
-}
-
-/* ── BOTTOM BAR ── */
+/* ─── Bottom bar ─────────────────────────────────────────── */
 #bar {
-  flex-shrink: 0;
-  background: var(--dark);
-  padding: .55rem 1rem .65rem;
-  display: flex;
-  flex-direction: column;
-  gap: .45rem;
-  align-items: center;
+  flex-shrink:0; height:var(--bar-h);
+  background:var(--dark);
+  border-top:1px solid rgba(255,255,255,.06);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:.42rem; padding:.4rem 1rem .5rem;
 }
-.row { display:flex; align-items:center; gap:.55rem; flex-wrap:wrap; justify-content:center; }
 
-/* buttons */
+/* btn base */
 .btn {
-  font-family:'Jost',sans-serif;
-  font-size:.73rem; font-weight:500;
-  letter-spacing:.07em; text-transform:uppercase;
-  border:none; border-radius:40px;
-  padding:.42rem 1.1rem;
-  cursor:pointer;
-  transition: transform .15s, opacity .15s, background .15s;
-  line-height: 1;
+  font-family:'Jost',sans-serif; font-size:.73rem; font-weight:500;
+  letter-spacing:.08em; text-transform:uppercase;
+  border:none; border-radius:40px; padding:.44rem 1.1rem;
+  cursor:pointer; line-height:1; white-space:nowrap;
+  transition:transform .15s, opacity .15s, background .15s, box-shadow .15s;
+  display:inline-flex; align-items:center; gap:.35rem;
 }
-.btn:disabled { opacity:.28; cursor:default; pointer-events:none; }
-.btn-p  { background:var(--pop); color:#fff; }
-.btn-p:hover  { background:#6e2e23; transform:translateY(-1px); }
-.btn-s  { background:var(--lt); color:var(--pop); }
-.btn-s:hover  { background:var(--accent); color:#fff; transform:translateY(-1px); }
-.btn-g  { background:rgba(253,244,240,.1); color:rgba(253,244,240,.82); border:1px solid rgba(253,244,240,.22); }
-.btn-g:hover  { background:rgba(253,244,240,.2); }
+.btn:disabled { opacity:.25; cursor:not-allowed; pointer-events:none; }
+.btn:not(:disabled):hover { transform:translateY(-1px); }
+.btn:not(:disabled):active { transform:translateY(0); }
 
-/* speed dropdown */
-select#spd {
-  font-family:'Jost',sans-serif;
-  font-size:.73rem; font-weight:500; letter-spacing:.05em;
-  background:rgba(253,244,240,.1);
-  color:rgba(253,244,240,.82);
-  border:1px solid rgba(253,244,240,.22);
-  border-radius:40px;
-  padding:.38rem 1.6rem .38rem .75rem;
-  cursor:pointer; outline:none;
-  -webkit-appearance:none; appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(253,244,240,.5)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;
-  background-position:right .6rem center;
+/* Primary – main action */
+.btn-primary {
+  background:var(--pop); color:#fff;
+  box-shadow:0 2px 10px rgba(139,58,47,.35);
+  padding:.5rem 1.4rem; font-size:.78rem;
 }
-select#spd option { background:#3b2420; color:#fdf4f0; }
+.btn-primary:not(:disabled):hover { background:#7a3128; box-shadow:0 4px 16px rgba(139,58,47,.45); }
 
-/* queue */
-#queue {
-  display:flex; gap:.45rem;
-  overflow-x:auto; padding:.1rem .2rem;
-  max-width:100%;
-  scrollbar-width:none;
-}
+/* Secondary */
+.btn-secondary { background:var(--lt); color:var(--pop); }
+.btn-secondary:not(:disabled):hover { background:var(--accent); color:#fff; }
+
+/* Ghost */
+.btn-ghost { background:rgba(253,244,240,.09); color:rgba(253,244,240,.78); border:1px solid rgba(253,244,240,.18); }
+.btn-ghost:not(:disabled):hover { background:rgba(253,244,240,.18); color:#fff; border-color:rgba(253,244,240,.35); }
+
+/* Rows */
+.ctrl-row { display:flex; align-items:center; gap:.5rem; flex-wrap:nowrap; }
+.divider   { width:1px; height:20px; background:rgba(255,255,255,.1); flex-shrink:0; }
+
+/* ─── Queue ──────────────────────────────────────────────── */
+#queue { display:flex; gap:.42rem; overflow-x:auto; padding:.1rem .2rem; scrollbar-width:none; }
 #queue::-webkit-scrollbar { display:none; }
 .qi {
-  flex-shrink:0; width:50px; height:38px;
+  flex-shrink:0; width:48px; height:37px;
   border-radius:6px; overflow:hidden;
-  border:2px solid transparent;
-  position:relative; cursor:default;
+  border:2px solid rgba(255,255,255,.08); position:relative;
   transition:border-color .2s;
 }
 .qi.current { border-color:var(--lt); }
-.qi.done    { opacity:.38; }
-.qi img {
-  width:100%; height:100%; object-fit:cover; display:block;
-  filter:blur(5px) brightness(.65);
-}
-.qi .qnum {
-  position:absolute; inset:0;
-  display:flex; align-items:center; justify-content:center;
-  font-size:.65rem; color:#fff; font-weight:600;
-  text-shadow:0 1px 3px rgba(0,0,0,.8);
-}
-.qi .qedit {
+.qi.done    { opacity:.35; }
+.qi img     { width:100%; height:100%; object-fit:cover; display:block; filter:blur(5px) brightness(.6); }
+.qi .qn     { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:.63rem; color:#fff; font-weight:600; text-shadow:0 1px 3px rgba(0,0,0,.9); }
+.qi .qe, .qi .qr {
   display:none; position:absolute;
-  bottom:1px; right:1px;
-  background:var(--pop); color:#fff;
-  border:none; border-radius:3px;
+  border:none; border-radius:3px; cursor:pointer;
   width:15px; height:15px; font-size:7px;
-  cursor:pointer; align-items:center; justify-content:center;
+  align-items:center; justify-content:center; color:#fff;
 }
-.qi:hover .qedit { display:flex; }
-.qi .qrm {
-  display:none; position:absolute;
-  top:1px; right:1px;
-  background:rgba(0,0,0,.65); color:#fff;
-  border:none; border-radius:50%;
-  width:14px; height:14px; font-size:8px;
-  cursor:pointer; align-items:center; justify-content:center;
-}
-.qi:hover .qrm { display:flex; }
+.qi .qe { bottom:1px; right:1px; background:var(--pop); border-radius:3px; }
+.qi .qr { top:1px; right:1px; background:rgba(0,0,0,.7); border-radius:50%; }
+.qi:hover .qe, .qi:hover .qr { display:flex; }
 .qadd {
-  flex-shrink:0; width:50px; height:38px;
-  border-radius:6px; border:1.5px dashed rgba(253,244,240,.25);
-  background:transparent; color:rgba(253,244,240,.4);
+  flex-shrink:0; width:48px; height:37px;
+  border-radius:6px; border:1.5px dashed rgba(253,244,240,.2);
+  background:transparent; color:rgba(253,244,240,.38);
   font-size:1.1rem; cursor:pointer;
   display:flex; align-items:center; justify-content:center;
   transition:all .2s;
 }
 .qadd:hover { border-color:var(--lt); color:var(--lt); }
 
-/* ── MODALS ── */
-.modal {
-  display:none; position:fixed; inset:0;
-  background:rgba(26,14,12,.6); backdrop-filter:blur(8px);
-  z-index:100; align-items:center; justify-content:center;
-}
+/* ─── Modals ─────────────────────────────────────────────── */
+.modal { display:none; position:fixed; inset:0; background:rgba(26,14,12,.62); backdrop-filter:blur(8px); z-index:100; align-items:center; justify-content:center; }
 .modal.on { display:flex; }
 .card {
   background:var(--bg); border-radius:18px;
   padding:2rem 2.4rem; max-width:480px; width:92%;
   box-shadow:0 24px 56px rgba(26,14,12,.35);
-  animation:pop .28s cubic-bezier(.34,1.56,.64,1) both;
-  display:flex; flex-direction:column; gap:.9rem;
+  animation:pop .26s cubic-bezier(.34,1.56,.64,1) both;
+  display:flex; flex-direction:column; gap:.85rem;
 }
-@keyframes pop { from{opacity:0;transform:scale(.88)} to{opacity:1;transform:scale(1)} }
-.card h2 {
-  font-family:'Cormorant Garamond',serif;
-  font-weight:300; font-size:1.55rem; color:var(--pop);
-}
-.lbl { font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:.28rem; }
-.inp {
-  width:100%; font-family:'Jost',sans-serif; font-size:.92rem;
-  padding:.58rem .85rem; border:1.5px solid var(--lt);
+@keyframes pop { from{opacity:0;transform:scale(.9)} to{opacity:1;transform:none} }
+.card h2    { font-family:'Cormorant Garamond',serif; font-weight:300; font-size:1.5rem; color:var(--pop); }
+.card .note { font-size:.81rem; line-height:1.7; color:var(--muted); }
+.flbl { font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:.26rem; }
+.finp {
+  width:100%; font-family:'Jost',sans-serif; font-size:.91rem;
+  padding:.56rem .82rem; border:1.5px solid var(--lt);
   border-radius:8px; background:#fff; color:var(--text);
   outline:none; transition:border-color .2s;
 }
-.inp:focus { border-color:var(--accent); }
-textarea.inp { resize:vertical; }
-.row-btns { display:flex; gap:.6rem; flex-wrap:wrap; }
-.btn-pm  { background:var(--pop); color:#fff; font-family:'Jost',sans-serif; font-size:.82rem; font-weight:500; letter-spacing:.06em; text-transform:uppercase; border:none; border-radius:40px; padding:.5rem 1.2rem; cursor:pointer; }
-.btn-pm:hover { background:#6e2e23; }
-.btn-gm  { background:transparent; color:var(--accent); border:1.5px solid var(--lt); font-family:'Jost',sans-serif; font-size:.82rem; font-weight:500; letter-spacing:.06em; text-transform:uppercase; border-radius:40px; padding:.5rem 1.2rem; cursor:pointer; }
-.btn-gm:hover { border-color:var(--accent); background:var(--surface); }
+.finp:focus { border-color:var(--accent); }
+textarea.finp { resize:vertical; }
+.mbtns { display:flex; gap:.55rem; flex-wrap:wrap; }
+.mbtn-p { font-family:'Jost',sans-serif; font-size:.8rem; font-weight:500; letter-spacing:.06em; text-transform:uppercase; background:var(--pop); color:#fff; border:none; border-radius:40px; padding:.48rem 1.2rem; cursor:pointer; transition:background .15s; }
+.mbtn-p:hover { background:#7a3128; }
+.mbtn-g { font-family:'Jost',sans-serif; font-size:.8rem; font-weight:500; letter-spacing:.06em; text-transform:uppercase; background:transparent; color:var(--accent); border:1.5px solid var(--lt); border-radius:40px; padding:.48rem 1.2rem; cursor:pointer; transition:all .15s; }
+.mbtn-g:hover { border-color:var(--accent); background:var(--surface); }
 
-/* ── SETUP PANEL ── */
+/* ─── Setup panel ────────────────────────────────────────── */
 #setup {
-  position:fixed; top:0; right:0; bottom:0;
-  width:310px; background:var(--bg);
-  border-left:1px solid var(--lt);
-  z-index:50; display:none;
-  flex-direction:column; overflow-y:auto;
-  padding:1.2rem 1rem;
-  gap:.9rem;
+  position:fixed; top:0; right:0; bottom:0; width:310px;
+  background:var(--bg); border-left:1px solid var(--lt);
+  z-index:50; display:none; flex-direction:column;
+  overflow-y:auto; padding:1.2rem 1rem 2rem; gap:.85rem;
   box-shadow:-8px 0 28px rgba(26,14,12,.18);
 }
 #setup.on { display:flex; }
-.sp-title {
-  font-family:'Cormorant Garamond',serif;
-  font-size:1.15rem; font-weight:300; color:var(--pop);
-  border-bottom:1px solid var(--lt); padding-bottom:.5rem;
+.sp-hdr {
+  display:flex; align-items:center; justify-content:space-between;
+  border-bottom:1px solid var(--lt); padding-bottom:.55rem;
 }
+.sp-hdr h3 { font-family:'Cormorant Garamond',serif; font-weight:300; font-size:1.15rem; color:var(--pop); }
+.sp-close { background:none; border:none; font-size:1.1rem; cursor:pointer; color:var(--muted); padding:.1rem .3rem; }
+.sp-close:hover { color:var(--pop); }
 .sp-sec { display:flex; flex-direction:column; gap:.5rem; }
-.sp-sec-lbl { font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
-.ic {
-  background:var(--surface); border-radius:9px;
-  padding:.65rem .75rem; display:flex; flex-direction:column; gap:.45rem;
-}
-.ic img {
-  width:100%; aspect-ratio:4/3; border-radius:5px;
-  object-fit:cover; filter:blur(4px); opacity:.65;
-}
-.ic-num { font-size:.68rem; color:var(--muted); letter-spacing:.05em; }
+.sp-lbl { font-size:.66rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+.sp-saverow { display:flex; gap:.5rem; }
+.ic { background:var(--surface); border-radius:9px; padding:.65rem .75rem; display:flex; flex-direction:column; gap:.42rem; }
+.ic img { width:100%; aspect-ratio:4/3; border-radius:5px; object-fit:cover; filter:blur(3px); opacity:.62; }
+.ic-n { font-size:.66rem; color:var(--muted); letter-spacing:.05em; }
 
-/* ── FINALE ── */
-#finale {
-  display:none; position:fixed; inset:0;
-  background:linear-gradient(135deg,#fdf4f0,#f5e0d8 55%,#e8b4a8);
-  z-index:200; flex-direction:column;
-  align-items:center; justify-content:center;
-  text-align:center; gap:1.2rem; padding:2rem;
-}
+/* url status */
+#urlst { font-size:.78rem; color:var(--muted); min-height:1rem; line-height:1.5; }
+
+/* ─── Finale ─────────────────────────────────────────────── */
+#finale { display:none; position:fixed; inset:0; background:linear-gradient(135deg,#fdf4f0,#f5e0d8 55%,#e8b4a8); z-index:200; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:1.15rem; padding:2rem; }
 #finale.on { display:flex; }
-#finale .fe  { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:.95rem; color:var(--muted); }
-#finale .ff  { font-size:clamp(2.8rem,7vw,4.5rem); }
-#finale .ft  { font-family:'Cormorant Garamond',serif; font-weight:300; font-size:clamp(2rem,5vw,3.5rem); color:var(--pop); line-height:1.05; }
-#finale .fd  { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(1.1rem,2.5vw,1.6rem); color:var(--accent); }
-#finale .fm  { max-width:420px; font-size:.92rem; line-height:1.8; color:var(--muted); }
-#finale .fhr { width:50px; height:1px; background:var(--lt); }
+.f-eye { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:.92rem; color:var(--muted); }
+.f-flag { font-size:clamp(2.8rem,7vw,4.5rem); }
+.f-title { font-family:'Cormorant Garamond',serif; font-weight:300; font-size:clamp(2rem,5vw,3.4rem); color:var(--pop); line-height:1.05; letter-spacing:.03em; }
+.f-dates { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(1.1rem,2.5vw,1.55rem); color:var(--accent); }
+.f-hr { width:50px; height:1px; background:var(--lt); }
+.f-msg { max-width:420px; font-size:.91rem; line-height:1.85; color:var(--muted); }
 
-/* ── CONFETTI ── */
+/* ─── Confetti ───────────────────────────────────────────── */
 #confetti { position:fixed; inset:0; pointer-events:none; z-index:300; }
-.pt {
-  position:absolute; top:-12px;
-  animation:fall linear both;
-}
-@keyframes fall {
-  0%   { transform:translateY(0) rotate(0deg);     opacity:1; }
-  100% { transform:translateY(110vh) rotate(600deg); opacity:0; }
-}
+.pt { position:absolute; top:-12px; animation:fall linear both; }
+@keyframes fall { 0%{transform:translateY(0) rotate(0deg);opacity:1} 100%{transform:translateY(110vh) rotate(600deg);opacity:0} }
 </style>
 </head>
 <body>
 
 <div id="confetti"></div>
 
+<!-- ── SHELL ──────────────────────────────────────────────── -->
 <div id="shell">
 
-  <!-- SIDEBAR -->
+  <!-- Sidebar -->
   <div id="sidebar">
     <p class="sb-title">Gelöst ✦</p>
     <p class="sb-hint" id="sbhint">Noch kein<br>Bild gelöst…</p>
   </div>
 
-  <!-- MAIN -->
+  <!-- Main -->
   <div id="main">
 
-    <!-- STAGE -->
+    <!-- Stage -->
     <div id="stage">
       <canvas id="cv"></canvas>
 
-      <div id="overlay-header">
+      <div id="hdr">
         <p class="sub">Ein kleines Rätsel für dich ✦</p>
         <h1>Was haben diese Bilder gemeinsam?</h1>
       </div>
 
-      <div id="dropzone" onclick="fi.click()">
+      <button id="btn-cfg" title="Einstellungen" onclick="toggleSetup()">⚙</button>
+
+      <div id="dz" onclick="fi.click()">
         <span class="dz-icon">🌸</span>
         <p class="dz-txt">Bilder hierher ziehen<br><small style="opacity:.7;font-size:.8em">oder klicken</small></p>
       </div>
 
-      <div id="timer">
-        <svg width="52" height="52" viewBox="0 0 52 52">
-          <circle class="t-bg" cx="26" cy="26" r="22"/>
-          <circle class="t-arc" id="tarc" cx="26" cy="26" r="22"/>
-        </svg>
-        <div class="t-num" id="tnum">—</div>
+      <!-- Step dots -->
+      <div id="dots">
+        <div class="dot" id="d0"></div>
+        <div class="dot" id="d1"></div>
+        <div class="dot" id="d2"></div>
+        <div class="dot" id="d3"></div>
+        <div class="dot" id="d4"></div>
       </div>
 
       <div id="status">Bilder hinzufügen, um das Spiel zu starten.</div>
     </div>
 
-    <!-- BOTTOM BAR -->
+    <!-- Bottom bar -->
     <div id="bar">
-      <div class="row">
-        <button class="btn btn-p"  id="bstart"  disabled>▶ Start</button>
-        <button class="btn btn-s"  id="bpause"  disabled>⏸ Pause</button>
-        <button class="btn btn-g"  id="bguess"  disabled>✋ Tipp</button>
-        <button class="btn btn-g"  id="bskip"   disabled>⏭ Überspringen</button>
-        <button class="btn btn-p"  id="bnext"   style="display:none">Weiter ▶</button>
-        <button class="btn btn-g"  id="bsetup"             >⚙ Einstellungen</button>
-        <button class="btn btn-g"  id="bsave"              >💾 Speichern</button>
-        <label  class="btn btn-g"  id="lbload" style="cursor:pointer">📂 Laden<input type="file" id="fiload" accept=".json" style="display:none"/></label>
-        <select id="spd">
-          <option value="0" selected>🐢 Sehr langsam</option>
-          <option value="1">Langsam</option>
-          <option value="2">Mittel</option>
-          <option value="3">Schnell</option>
-          <option value="4">⚡ Sehr schnell</option>
-        </select>
+      <div class="ctrl-row">
+        <!-- Game start -->
+        <button class="btn btn-secondary" id="bstart" disabled>▶ Start</button>
+
+        <div class="divider"></div>
+
+        <!-- Primary reveal action -->
+        <button class="btn btn-primary" id="breveal" disabled>Aufdecken ▶</button>
+
+        <!-- Guess -->
+        <button class="btn btn-ghost" id="bguess" disabled>✋ Tipp</button>
+
+        <!-- Skip / Next – only one visible at a time -->
+        <button class="btn btn-ghost" id="bskip"   disabled>⏭ Überspringen</button>
+        <button class="btn btn-secondary" id="bnext" style="display:none">Weiter →</button>
       </div>
-      <div class="row">
-        <div id="queue"></div>
-      </div>
+
+      <!-- Queue -->
+      <div id="queue"></div>
     </div>
 
   </div>
 </div>
 
-<!-- SETUP PANEL -->
+<!-- ── SETUP PANEL ─────────────────────────────────────────── -->
 <div id="setup">
-  <p class="sp-title">⚙ Einstellungen</p>
-  <div class="sp-sec">
-    <p class="sp-sec-lbl">Finale — Reisedaten</p>
-    <div><p class="lbl">Von</p><input class="inp" id="tfrom" placeholder="z. B. 12. Juli 2025"/></div>
-    <div><p class="lbl">Bis</p><input class="inp" id="tto"   placeholder="z. B. 19. Juli 2025"/></div>
-    <div><p class="lbl">Persönliche Nachricht</p><textarea class="inp" id="tmsg" rows="3" placeholder="z. B. Für dich, weil du es verdient hast …"></textarea></div>
+  <div class="sp-hdr">
+    <h3>⚙ Einstellungen</h3>
+    <button class="sp-close" onclick="toggleSetup()">✕</button>
   </div>
+
+  <!-- Save / Load -->
+  <div class="sp-sec">
+    <p class="sp-lbl">Stand speichern & laden</p>
+    <div class="sp-saverow">
+      <button class="mbtn-p" id="bsave">💾 Speichern</button>
+      <label class="mbtn-g" style="cursor:pointer">📂 Laden<input type="file" id="fiload" accept=".json" style="display:none"/></label>
+    </div>
+    <div>
+      <p class="flbl">Von URL laden</p>
+      <div style="display:flex;gap:.4rem;margin-top:.2rem">
+        <input class="finp" id="urlinp" type="url" placeholder="https://… Raw-Link …" style="flex:1;font-size:.8rem"/>
+        <button class="mbtn-p" id="bloadurl" style="white-space:nowrap">Laden</button>
+      </div>
+      <p id="urlst" style="margin-top:.3rem"></p>
+      <details style="margin-top:.4rem">
+        <summary style="font-size:.73rem;color:var(--muted);cursor:pointer">Wie erstelle ich einen Raw-Link?</summary>
+        <div style="font-size:.74rem;color:var(--muted);line-height:1.8;margin-top:.4rem">
+          <strong style="color:var(--text)">GitHub Gist:</strong> Datei hochladen → „Raw" klicken → URL kopieren<br>
+          <strong style="color:var(--text)">Dropbox:</strong> Link kopieren → <code>?dl=0</code> durch <code>?raw=1</code> ersetzen
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- Travel data -->
+  <div class="sp-sec">
+    <p class="sp-lbl">Finale — Reisedaten</p>
+    <div><p class="flbl">Von</p><input class="finp" id="tfrom" placeholder="z. B. 12. Juli 2025"/></div>
+    <div><p class="flbl">Bis</p><input class="finp" id="tto"   placeholder="z. B. 19. Juli 2025"/></div>
+    <div><p class="flbl">Persönliche Nachricht</p><textarea class="finp" id="tmsg" rows="3" placeholder="z. B. Für dich, weil du es verdient hast …"></textarea></div>
+  </div>
+
+  <!-- Image config -->
   <div class="sp-sec" id="imgcfg">
-    <p class="sp-sec-lbl">Bilder & Quizfragen</p>
+    <p class="sp-lbl">Bilder & Quizfragen</p>
     <p style="font-size:.78rem;color:var(--muted)">Füge zuerst Bilder hinzu.</p>
   </div>
-  <button class="btn-pm" id="bclosesetup" style="align-self:flex-start;margin-top:.4rem">✓ Fertig</button>
 </div>
 
-<!-- QUIZ MODAL -->
+<!-- ── QUIZ MODAL ──────────────────────────────────────────── -->
 <div class="modal" id="mquiz">
   <div class="card">
     <h2 id="qhead">Was siehst du auf dem Bild?</h2>
-    <div><p class="lbl">Antwort</p><input class="inp" id="qans" type="text" placeholder="Deine Antwort …" autocomplete="off"/></div>
-    <div class="row-btns">
-      <button class="btn-pm" id="bcorrect">✓ Richtig!</button>
-      <button class="btn-gm" id="bwrong">✗ Falsch – weiter</button>
-      <button class="btn-gm" id="bcloseq">Abbrechen</button>
+    <div><p class="flbl">Antwort</p><input class="finp" id="qans" type="text" placeholder="Deine Antwort …" autocomplete="off"/></div>
+    <div class="mbtns">
+      <button class="mbtn-p" id="bcorrect">✓ Richtig!</button>
+      <button class="mbtn-g" id="bwrong">✗ Falsch – weiter</button>
+      <button class="mbtn-g" id="bcloseq">Abbrechen</button>
     </div>
   </div>
 </div>
 
-<!-- LABEL MODAL -->
+<!-- ── LABEL MODAL ─────────────────────────────────────────── -->
 <div class="modal" id="mlabel">
   <div class="card" style="max-width:340px">
     <h2>Bezeichnung</h2>
-    <div><p class="lbl">Name für dieses Bild</p><input class="inp" id="linp" type="text" placeholder="z. B. Vejers Strand"/></div>
-    <div class="row-btns">
-      <button class="btn-pm" id="bsavelbl">Speichern</button>
-      <button class="btn-gm" id="bcancellbl">Abbrechen</button>
+    <div><p class="flbl">Name für dieses Bild</p><input class="finp" id="linp" type="text" placeholder="z. B. Vejers Strand"/></div>
+    <div class="mbtns">
+      <button class="mbtn-p" id="bsavelbl">Speichern</button>
+      <button class="mbtn-g" id="bcancellbl">Abbrechen</button>
     </div>
   </div>
 </div>
 
-<!-- FINALE -->
+<!-- ── FINALE ──────────────────────────────────────────────── -->
 <div id="finale">
-  <p class="fe">Dein Geburtstagsgeschenk 🌸</p>
-  <p class="ff">🇩🇰</p>
-  <p class="ft">Dänemark –<br>Vejers Strand</p>
-  <p class="fd" id="fdates">Datum folgt …</p>
-  <div class="fhr"></div>
-  <p class="fm" id="fmsg">Wir wünschen dir eine wunderschöne Reise!</p>
-  <button class="btn-pm" id="brestart" style="margin-top:.5rem">↺ Neu starten</button>
+  <p class="f-eye">Dein Geburtstagsgeschenk 🌸</p>
+  <p class="f-flag">🇩🇰</p>
+  <p class="f-title">Dänemark –<br>Vejers Strand</p>
+  <p class="f-dates" id="fdates">Datum folgt …</p>
+  <div class="f-hr"></div>
+  <p class="f-msg" id="fmsg">Alles Gute zum Geburtstag von uns allen!<br>Wir freuen uns schon 🌊</p>
+  <button class="mbtn-p" id="brestart" style="margin-top:.5rem">↺ Neu starten</button>
 </div>
 
 <input type="file" id="fi" multiple accept="image/*" style="display:none"/>
 
 <script>
-// ── DATA ──────────────────────────────────────────────────────
-const SPEEDS = [1100, 700, 420, 220, 90]; // ms per pixel step
-const STEPS  = [64, 50, 38, 29, 22, 17, 13, 10, 7, 5, 4, 3, 2, 1];
-const PETAL_COLORS = ['#f5e0d8','#e8b4a8','#c97b6e','#8b3a2f','#f9d4c8'];
+// ═══════════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════════
+// 5 manual reveal steps: very pixelated → clear
+const STEPS = [52, 24, 12, 5, 1];
+const PETAL = ['#f5e0d8','#e8b4a8','#c97b6e','#8b3a2f','#f9d4c8'];
+const DOTS  = [0,1,2,3,4].map(i => document.getElementById('d'+i));
 
-let imgs    = [];   // {img, url, name, question, solved}
+// ═══════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════
+let imgs    = [];
 let cur     = -1;
-let running = false;
-let paused  = false;
-let stepIdx = 0;
-let loopId  = null;
-let timerId = null;
-let timerLeft = 0;
-let timerMax  = 0;
+let step    = 0;   // 0–4, current reveal step
+let active  = false;
 let editIdx = -1;
 
-// ── DOM ───────────────────────────────────────────────────────
-const stage   = document.getElementById('stage');
-const cv      = document.getElementById('cv');
-const cx      = cv.getContext('2d');
-const dz      = document.getElementById('dropzone');
-const fi      = document.getElementById('fi');
-const bstart  = document.getElementById('bstart');
-const bpause  = document.getElementById('bpause');
-const bguess  = document.getElementById('bguess');
-const bskip   = document.getElementById('bskip');
-const bnext   = document.getElementById('bnext');
-const bsetup  = document.getElementById('bsetup');
-const spd     = document.getElementById('spd');
-const queueEl = document.getElementById('queue');
-const sb      = document.getElementById('sidebar');
-const sbhint  = document.getElementById('sbhint');
-const statusEl= document.getElementById('status');
-const timerEl = document.getElementById('timer');
-const tarc    = document.getElementById('tarc');
-const tnum    = document.getElementById('tnum');
-const setupEl = document.getElementById('setup');
-const imgcfg  = document.getElementById('imgcfg');
-const mquiz   = document.getElementById('mquiz');
-const qhead   = document.getElementById('qhead');
-const qans    = document.getElementById('qans');
-const bcorrect= document.getElementById('bcorrect');
-const bwrong  = document.getElementById('bwrong');
-const bcloseq = document.getElementById('bcloseq');
-const mlabel  = document.getElementById('mlabel');
-const linp    = document.getElementById('linp');
-const finale  = document.getElementById('finale');
-const fdates  = document.getElementById('fdates');
-const fmsg    = document.getElementById('fmsg');
-const confEl  = document.getElementById('confetti');
+// ═══════════════════════════════════════════════════
+//  DOM REFS
+// ═══════════════════════════════════════════════════
+const stage  = document.getElementById('stage');
+const cv     = document.getElementById('cv');
+const cx     = cv.getContext('2d');
+const dz     = document.getElementById('dz');
+const fi     = document.getElementById('fi');
+const bstart = document.getElementById('bstart');
+const breveal= document.getElementById('breveal');
+const bguess = document.getElementById('bguess');
+const bskip  = document.getElementById('bskip');
+const bnext  = document.getElementById('bnext');
+const queueEl= document.getElementById('queue');
+const statusEl=document.getElementById('status');
+const dotsEl = document.getElementById('dots');
+const setupEl= document.getElementById('setup');
+const imgcfg = document.getElementById('imgcfg');
+const sb     = document.getElementById('sidebar');
+const sbhint = document.getElementById('sbhint');
+const mquiz  = document.getElementById('mquiz');
+const qhead  = document.getElementById('qhead');
+const qans   = document.getElementById('qans');
+const mlabel = document.getElementById('mlabel');
+const linp   = document.getElementById('linp');
+const finale = document.getElementById('finale');
+const confEl = document.getElementById('confetti');
 
-// ── CANVAS SIZING ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+//  CANVAS
+// ═══════════════════════════════════════════════════
 function sizeCanvas() {
-  const w = stage.clientWidth;
-  const h = stage.clientHeight;
-  if (cv.width !== w)  cv.width  = w;
-  if (cv.height !== h) cv.height = h;
-  return { w, h };
+  cv.width  = stage.clientWidth;
+  cv.height = stage.clientHeight;
 }
 
-// ── DRAW ──────────────────────────────────────────────────────
 function draw(ps) {
-  const { w, h } = sizeCanvas();
-  if (!w || !h) return;
-  const item = imgs[cur];
-  if (!item) return;
+  const w = cv.width, h = cv.height;
+  if (!w || !h || cur < 0 || !imgs[cur]) return;
   cx.clearRect(0, 0, w, h);
   if (ps <= 1) {
     cx.imageSmoothingEnabled = true;
-    cx.drawImage(item.img, 0, 0, w, h);
+    cx.drawImage(imgs[cur].img, 0, 0, w, h);
     return;
   }
-  // Pixelation: draw tiny, scale up
   const pw = Math.max(1, Math.ceil(w / ps));
   const ph = Math.max(1, Math.ceil(h / ps));
   cx.imageSmoothingEnabled = false;
-  cx.drawImage(item.img, 0, 0, pw, ph);
+  cx.drawImage(imgs[cur].img, 0, 0, pw, ph);
   cx.drawImage(cv, 0, 0, pw, ph, 0, 0, w, h);
 }
 
-// ── FILES ─────────────────────────────────────────────────────
-fi.onchange = e => { loadFiles(e.target.files); fi.value = ''; };
-dz.addEventListener('dragover', e => e.preventDefault());
-dz.addEventListener('drop', e => { e.preventDefault(); loadFiles(e.dataTransfer.files); });
+window.addEventListener('resize', () => {
+  if (cur >= 0 && imgs[cur]) { sizeCanvas(); draw(STEPS[step]); }
+});
 
-function loadFiles(files) {
+// ═══════════════════════════════════════════════════
+//  FILES
+// ═══════════════════════════════════════════════════
+fi.onchange = e => { addFiles(e.target.files); fi.value = ''; };
+dz.addEventListener('dragover', e => e.preventDefault());
+dz.addEventListener('drop', e => { e.preventDefault(); addFiles(e.dataTransfer.files); });
+
+function addFiles(files) {
   [...files].forEach(f => {
     if (!f.type.startsWith('image/')) return;
     const url = URL.createObjectURL(f);
     const img = new Image();
     img.onload = () => {
-      imgs.push({ img, url, name: cleanName(f.name), question: '', solved: false });
-      renderQueue();
-      renderImgCfg();
-      updateUI();
+      imgs.push({ img, url, name: cleanName(f.name), question:'', solved:false });
+      renderQueue(); renderImgCfg(); syncUI();
     };
     img.src = url;
   });
 }
-function cleanName(n) { return n.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' '); }
+const cleanName = n => n.replace(/\.[^.]+$/, '').replace(/[-_]/g,' ');
 
-// ── QUEUE ─────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+//  QUEUE
+// ═══════════════════════════════════════════════════
 function renderQueue() {
   queueEl.innerHTML = '';
   imgs.forEach((item, i) => {
     const d = document.createElement('div');
-    d.className = 'qi' + (i === cur ? ' current' : '') + (item.solved ? ' done' : '');
-    d.innerHTML = `<img src="${item.url}"><span class="qnum">${i+1}</span>
-      <button class="qedit" title="Bezeichnung" onclick="openLabel(${i})">✎</button>
-      <button class="qrm"   title="Entfernen"   onclick="removeImg(${i})">✕</button>`;
+    d.className = 'qi' + (i===cur?' current':'') + (item.solved?' done':'');
+    d.innerHTML =
+      `<img src="${item.url}"><span class="qn">${i+1}</span>`+
+      `<button class="qe" title="Bezeichnung" onclick="openLabel(${i})">✎</button>`+
+      `<button class="qr" title="Entfernen"   onclick="removeImg(${i})">✕</button>`;
     queueEl.appendChild(d);
   });
   const add = document.createElement('button');
-  add.className = 'qadd';
-  add.title = 'Bilder hinzufügen';
-  add.textContent = '＋';
+  add.className='qadd'; add.title='Bilder hinzufügen'; add.textContent='＋';
   add.onclick = () => fi.click();
   queueEl.appendChild(add);
 }
 
 function removeImg(i) {
   URL.revokeObjectURL(imgs[i].url);
-  imgs.splice(i, 1);
-  if (cur >= imgs.length) cur = imgs.length - 1;
-  renderQueue(); renderImgCfg(); updateUI();
-  if (!imgs.length) { cx.clearRect(0, 0, cv.width, cv.height); }
+  imgs.splice(i,1);
+  if (cur >= imgs.length) cur = imgs.length-1;
+  renderQueue(); renderImgCfg(); syncUI();
+  if (!imgs.length) cx.clearRect(0,0,cv.width,cv.height);
 }
 
-// ── SETUP PANEL ───────────────────────────────────────────────
-bsetup.onclick    = () => setupEl.classList.toggle('on');
-document.getElementById('bclosesetup').onclick = () => setupEl.classList.remove('on');
-
-function renderImgCfg() {
-  imgcfg.innerHTML = '<p class="sp-sec-lbl">Bilder & Quizfragen</p>';
-  if (!imgs.length) {
-    imgcfg.innerHTML += '<p style="font-size:.78rem;color:var(--muted)">Füge zuerst Bilder hinzu.</p>';
-    return;
-  }
-  imgs.forEach((item, i) => {
-    const d = document.createElement('div');
-    d.className = 'ic';
-    d.innerHTML = `
-      <p class="ic-num">Bild ${i+1}</p>
-      <img src="${item.url}">
-      <div><p class="lbl">Bezeichnung</p>
-        <input class="inp" value="${item.name}" placeholder="z. B. Vejers Strand"
-          oninput="imgs[${i}].name=this.value"/>
-      </div>
-      <div><p class="lbl">Quizfrage (optional)</p>
-        <input class="inp" value="${item.question}" placeholder="z. B. In welchem Land liegt das?"
-          oninput="imgs[${i}].question=this.value"/>
-      </div>`;
-    imgcfg.appendChild(d);
+// ═══════════════════════════════════════════════════
+//  DOTS
+// ═══════════════════════════════════════════════════
+function renderDots(s) {
+  DOTS.forEach((d,i) => {
+    d.className = 'dot' + (i<s ? ' done' : i===s ? ' current' : '');
   });
 }
 
-// ── LABEL MODAL ───────────────────────────────────────────────
-function openLabel(i) {
-  editIdx = i;
-  linp.value = imgs[i].name;
-  mlabel.classList.add('on');
-  setTimeout(() => linp.focus(), 80);
-}
-document.getElementById('bsavelbl').onclick = () => {
-  if (editIdx >= 0) { imgs[editIdx].name = linp.value.trim() || imgs[editIdx].name; renderQueue(); renderImgCfg(); }
-  mlabel.classList.remove('on'); editIdx = -1;
-};
-document.getElementById('bcancellbl').onclick = () => { mlabel.classList.remove('on'); editIdx = -1; };
-linp.onkeydown = e => { if (e.key === 'Enter') document.getElementById('bsavelbl').click(); };
-
-// ── GAME CONTROL ──────────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+//  GAME FLOW
+// ═══════════════════════════════════════════════════
 bstart.onclick = () => {
   if (!imgs.length) return;
-  cur = nextUnsolved(-1);
-  if (cur === -1) { setStatus('Alle Bilder gelöst! 🎉'); return; }
-  running = true; paused = false;
+  const n = nextUnsolved(-1);
+  if (n === -1) { setStatus('Alle Bilder gelöst! 🎉'); return; }
+  cur = n; step = 0; active = true;
   setupEl.classList.remove('on');
-  updateUI();
-  startImage();
-};
-
-bpause.onclick = () => {
-  paused = !paused;
-  bpause.textContent = paused ? '▶ Weiter' : '⏸ Pause';
-  setStatus(paused ? 'Pausiert.' : `Bild ${cur+1} von ${imgs.length} – Auflösung läuft …`);
-};
-
-bskip.onclick = () => {
-  stopLoops();
-  timerEl.classList.remove('on');
-  bnext.style.display = 'none';
-  bguess.disabled = false; bskip.disabled = false;
-  const n = nextUnsolved(cur);
-  if (n === -1) { endGame(); return; }
-  cur = n; startImage();
-};
-
-bnext.onclick = () => {
-  bnext.style.display = 'none';
-  bguess.disabled = false; bskip.disabled = false;
-  const n = nextUnsolved(cur);
-  if (n === -1) { endGame(); return; }
-  cur = n; startImage();
-};
-
-bguess.onclick = openQuiz;
-spd.onchange = () => { if (running && !paused) { stopLoops(); continueLoop(); } };
-
-function nextUnsolved(from) {
-  for (let i = from + 1; i < imgs.length; i++) if (!imgs[i].solved) return i;
-  return -1;
-}
-
-// ── IMAGE LOOP ────────────────────────────────────────────────
-function startImage() {
-  stepIdx = 0;
   sizeCanvas();
-  renderQueue();
-  setStatus(`Bild ${cur+1} von ${imgs.length} – Was könnte das sein?`);
   draw(STEPS[0]);
-  startTimer();
-  loopId = setInterval(tick, SPEEDS[+spd.value]);
-}
+  dotsEl.classList.add('visible');
+  renderDots(0);
+  renderQueue();
+  setStatus('Stufe 1 von 5 – „Aufdecken" zum Weiteraufdecken.');
+  syncUI();
+};
 
-function tick() {
-  if (paused) return;
-  stepIdx++;
-  if (stepIdx >= STEPS.length) {
-    stopLoops();
-    draw(1);
-    setStatus('Vollständig aufgedeckt – Handzeichen für Tipp! ✋');
-    return;
+breveal.onclick = () => {
+  if (!active || step >= STEPS.length-1) return;
+  step++;
+  draw(STEPS[step]);
+  renderDots(step);
+  if (step === STEPS.length-1) {
+    setStatus('Vollständig aufgedeckt. Handzeichen für Tipp! ✋');
+    breveal.disabled = true;
+  } else {
+    setStatus(`Stufe ${step+1} von 5 – weiter aufdecken oder Tipp geben.`);
   }
-  draw(STEPS[stepIdx]);
-}
+};
 
-function continueLoop() {
-  stopLoops();
-  loopId = setInterval(tick, SPEEDS[+spd.value]);
-  startTimer();
-}
-
-function startTimer() {
-  stopTimer();
-  timerMax  = Math.ceil((STEPS.length * SPEEDS[+spd.value]) / 1000);
-  timerLeft = timerMax;
-  timerEl.classList.add('on');
-  updateTimerUI();
-  timerId = setInterval(() => {
-    if (paused) return;
-    timerLeft = Math.max(0, timerLeft - 1);
-    updateTimerUI();
-    if (timerLeft === 0) stopTimer();
-  }, 1000);
-}
-
-function updateTimerUI() {
-  const pct = timerMax > 0 ? timerLeft / timerMax : 0;
-  tarc.style.strokeDashoffset = (138.2 * (1 - pct)).toFixed(2);
-  tnum.textContent = timerLeft > 0 ? timerLeft : '✓';
-}
-
-function stopLoops() { clearInterval(loopId); loopId = null; }
-function stopTimer() { clearInterval(timerId); timerId = null; }
-
-// ── QUIZ ──────────────────────────────────────────────────────
-function openQuiz() {
-  paused = true;
+bguess.onclick = () => {
   const q = imgs[cur].question;
   qhead.textContent = q || 'Was siehst du auf dem Bild?';
   qans.value = '';
   mquiz.classList.add('on');
   setTimeout(() => qans.focus(), 80);
-}
-function closeQuiz() { mquiz.classList.remove('on'); }
-function resumeGame() { paused = false; setStatus(`Bild ${cur+1} – weiter …`); }
+};
 
-bcorrect.onclick = () => {
+bskip.onclick = () => advance(false);
+bnext.onclick = () => advance(true);
+
+function advance(afterCorrect) {
+  if (!afterCorrect) draw(STEPS[0]); // flash back to pixelated? No – just move on
+  const n = nextUnsolved(cur);
+  if (n === -1) { endGame(); return; }
+  cur = n; step = 0;
+  sizeCanvas();
+  draw(STEPS[0]);
+  renderDots(0);
+  renderQueue();
+  setStatus(`Bild ${cur+1} von ${imgs.length} – bereit.`);
+  // reset button states
+  bnext.style.display  = 'none';
+  bskip.style.display  = '';
+  breveal.disabled     = false;
+  bguess.disabled      = false;
+  bskip.disabled       = false;
+}
+
+function nextUnsolved(from) {
+  for (let i=from+1; i<imgs.length; i++) if (!imgs[i].solved) return i;
+  return -1;
+}
+
+// ─ Space bar shortcut for reveal ─
+document.addEventListener('keydown', e => {
+  if (e.code==='Space' && !mquiz.classList.contains('on') && !mlabel.classList.contains('on')) {
+    e.preventDefault();
+    if (!breveal.disabled && active) breveal.click();
+  }
+});
+
+// ═══════════════════════════════════════════════════
+//  QUIZ
+// ═══════════════════════════════════════════════════
+document.getElementById('bcorrect').onclick = () => {
   const label = qans.value.trim() || imgs[cur].name;
-  closeQuiz();
-  stopLoops(); stopTimer();
-  timerEl.classList.remove('on');
+  mquiz.classList.remove('on');
   imgs[cur].solved = true;
   imgs[cur].name   = label;
-  draw(1);
+  draw(1);  // reveal fully on correct
   addToSidebar(imgs[cur]);
   renderQueue();
   triggerConfetti();
-  setStatus(`✓ Richtig! „${label}" – gut gemacht! 🌸`);
+  setStatus(`✓ Richtig! „${label}" 🌸  Klicke „Weiter" für das nächste Bild.`);
+  // Show Weiter, hide Aufdecken + Überspringen
+  breveal.disabled    = true;
+  bguess.disabled     = true;
+  bskip.style.display = 'none';
   bnext.style.display = 'inline-flex';
-  bguess.disabled = true;
-  bskip.disabled  = true;
 };
-bwrong.onclick   = () => { closeQuiz(); resumeGame(); };
-bcloseq.onclick  = () => { closeQuiz(); resumeGame(); };
-qans.onkeydown   = e => { if (e.key === 'Enter') bcorrect.click(); };
+document.getElementById('bwrong').onclick  = () => mquiz.classList.remove('on');
+document.getElementById('bcloseq').onclick = () => mquiz.classList.remove('on');
+qans.onkeydown = e => { if (e.key==='Enter') document.getElementById('bcorrect').click(); };
 
-// ── END GAME ──────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+//  END GAME
+// ═══════════════════════════════════════════════════
 function endGame() {
-  running = false; updateUI();
+  active = false;
+  dotsEl.classList.remove('visible');
+  syncUI();
   const from = document.getElementById('tfrom').value.trim();
   const to   = document.getElementById('tto').value.trim();
   const msg  = document.getElementById('tmsg').value.trim();
-  fdates.textContent = (from && to) ? `${from} – ${to}` : from ? `Ab ${from}` : 'Datum folgt …';
-  fmsg.textContent   = msg || 'Wir wünschen dir eine wunderschöne Reise! 🌊';
-  setTimeout(() => { finale.classList.add('on'); triggerConfetti(); }, 700);
+  document.getElementById('fdates').textContent =
+    (from && to) ? `${from} – ${to}` : from ? `Ab ${from}` : 'Datum folgt …';
+  document.getElementById('fmsg').innerHTML = msg ? msg.replace(/\n/g,'<br>') : 'Alles Gute zum Geburtstag von uns allen!<br>Wir freuen uns schon 🌊';
+  setTimeout(() => { finale.classList.add('on'); triggerConfetti(); }, 600);
 }
 
 document.getElementById('brestart').onclick = () => {
   finale.classList.remove('on');
-  imgs.forEach(i => i.solved = false);
-  cur = -1; running = false; paused = false;
-  bnext.style.display = 'none';
-  [...sb.querySelectorAll('.sb-item')].forEach(el => el.remove());
-  sbhint.style.display = '';
-  cx.clearRect(0, 0, cv.width, cv.height);
-  renderQueue(); updateUI();
+  imgs.forEach(i => i.solved=false);
+  cur=-1; step=0; active=false;
+  bnext.style.display='none'; bskip.style.display='';
+  [...sb.querySelectorAll('.sb-item')].forEach(el=>el.remove());
+  sbhint.style.display='';
+  cx.clearRect(0,0,cv.width,cv.height);
+  dotsEl.classList.remove('visible');
+  renderQueue(); syncUI();
   setStatus('Bilder bereit – starte das Spiel.');
 };
 
-// ── SIDEBAR ───────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+//  SIDEBAR
+// ═══════════════════════════════════════════════════
 function addToSidebar(item) {
-  sbhint.style.display = 'none';
+  sbhint.style.display='none';
   const d = document.createElement('div');
-  d.className = 'sb-item';
-  d.innerHTML = `<img class="sb-thumb" src="${item.url}"><span class="sb-label">${item.name}</span>`;
+  d.className='sb-item';
+  d.innerHTML=`<img class="sb-thumb" src="${item.url}"><span class="sb-label">${item.name}</span>`;
   sb.querySelector('.sb-title').insertAdjacentElement('afterend', d);
 }
 
-// ── CONFETTI ──────────────────────────────────────────────────
-function triggerConfetti() {
-  confEl.innerHTML = '';
-  for (let i = 0; i < 72; i++) {
-    const p = document.createElement('div');
-    p.className = 'pt';
-    const size = 5 + Math.random() * 8;
-    p.style.cssText =
-      `left:${Math.random()*100}%;` +
-      `width:${size}px;height:${size}px;` +
-      `border-radius:${Math.random()>.5?'50% 0':'50%'};` +
-      `background:${PETAL_COLORS[Math.floor(Math.random()*PETAL_COLORS.length)]};` +
-      `animation-duration:${1.4+Math.random()*2}s;` +
-      `animation-delay:${Math.random()*.6}s;`;
-    confEl.appendChild(p);
+// ═══════════════════════════════════════════════════
+//  SETUP PANEL
+// ═══════════════════════════════════════════════════
+function toggleSetup() { setupEl.classList.toggle('on'); }
+
+function renderImgCfg() {
+  imgcfg.innerHTML='<p class="sp-lbl">Bilder & Quizfragen</p>';
+  if (!imgs.length) {
+    imgcfg.innerHTML+='<p style="font-size:.78rem;color:var(--muted)">Füge zuerst Bilder hinzu.</p>';
+    return;
   }
-  setTimeout(() => confEl.innerHTML = '', 4000);
+  imgs.forEach((item,i) => {
+    const d=document.createElement('div'); d.className='ic';
+    d.innerHTML=`<p class="ic-n">Bild ${i+1}</p>
+      <img src="${item.url}">
+      <div><p class="flbl">Bezeichnung</p>
+        <input class="finp" value="${item.name}" placeholder="z. B. Vejers Strand" oninput="imgs[${i}].name=this.value"/></div>
+      <div><p class="flbl">Quizfrage (optional)</p>
+        <input class="finp" value="${item.question}" placeholder="z. B. In welchem Land liegt das?" oninput="imgs[${i}].question=this.value"/></div>`;
+    imgcfg.appendChild(d);
+  });
 }
 
-// ── UI STATE ──────────────────────────────────────────────────
-function setStatus(t) { statusEl.textContent = t; }
-
-function updateUI() {
-  const has = imgs.length > 0;
-  bstart.disabled = !has || running;
-  bpause.disabled = !running;
-  bguess.disabled = !running;
-  bskip.disabled  = !running;
-  dz.classList.toggle('hidden', has);
+// ═══════════════════════════════════════════════════
+//  LABEL MODAL
+// ═══════════════════════════════════════════════════
+function openLabel(i) {
+  editIdx=i; linp.value=imgs[i].name;
+  mlabel.classList.add('on');
+  setTimeout(()=>linp.focus(),80);
 }
+document.getElementById('bsavelbl').onclick = () => {
+  if (editIdx>=0) { imgs[editIdx].name=linp.value.trim()||imgs[editIdx].name; renderQueue(); renderImgCfg(); }
+  mlabel.classList.remove('on'); editIdx=-1;
+};
+document.getElementById('bcancellbl').onclick = () => { mlabel.classList.remove('on'); editIdx=-1; };
+linp.onkeydown = e => { if(e.key==='Enter') document.getElementById('bsavelbl').click(); };
 
-// ── RESIZE ────────────────────────────────────────────────────
-window.addEventListener('resize', () => {
-  if (cur >= 0 && imgs[cur]) {
-    sizeCanvas();
-    draw(STEPS[Math.min(stepIdx, STEPS.length - 1)]);
-  }
-});
-
-
-// ── SAVE / LOAD ───────────────────────────────────────────────
-document.getElementById('bsave').onclick = saveState;
-document.getElementById('fiload').onchange = e => { loadState(e.target.files[0]); e.target.value=''; };
-
-function imgToBase64(img) {
-  const c2 = document.createElement('canvas');
-  c2.width  = img.naturalWidth;
-  c2.height = img.naturalHeight;
-  c2.getContext('2d').drawImage(img, 0, 0);
-  return c2.toDataURL('image/jpeg', 0.88);
-}
-
-function saveState() {
-  if (!imgs.length) { alert('Keine Bilder zum Speichern vorhanden.'); return; }
+// ═══════════════════════════════════════════════════
+//  SAVE / LOAD
+// ═══════════════════════════════════════════════════
+document.getElementById('bsave').onclick = () => {
+  if (!imgs.length) { alert('Keine Bilder zum Speichern.'); return; }
   setStatus('Wird gespeichert …');
   setTimeout(() => {
     try {
       const data = {
-        v: 1,
+        v:1,
         travelFrom: document.getElementById('tfrom').value,
         travelTo:   document.getElementById('tto').value,
         travelMsg:  document.getElementById('tmsg').value,
-        images: imgs.map(item => ({
-          name:     item.name,
-          question: item.question,
-          solved:   false,
-          data:     imgToBase64(item.img)
-        }))
+        images: imgs.map(item => {
+          const c2=document.createElement('canvas');
+          c2.width=item.img.naturalWidth; c2.height=item.img.naturalHeight;
+          c2.getContext('2d').drawImage(item.img,0,0);
+          return { name:item.name, question:item.question, solved:false, data:c2.toDataURL('image/jpeg',.88) };
+        })
       };
-      const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'denmark-quiz-stand.json';
-      a.click();
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));
+      a.download='denmark-quiz-stand.json'; a.click();
       URL.revokeObjectURL(a.href);
       setStatus(`✓ ${imgs.length} Bilder gespeichert.`);
-    } catch(e) {
-      setStatus('Fehler beim Speichern – Bilder zu groß?');
-    }
+    } catch(e) { setStatus('Fehler beim Speichern.'); }
   }, 50);
-}
+};
 
-function loadState(file) {
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (data.v !== 1 || !Array.isArray(data.images)) throw new Error('Ungültiges Format');
+document.getElementById('fiload').onchange = e => { if(e.target.files[0]) applyFile(e.target.files[0]); e.target.value=''; };
 
-      // Reset
-      imgs.forEach(i => URL.revokeObjectURL(i.url));
-      imgs = [];
-      cur = -1; running = false; paused = false;
-      bnext.style.display = 'none';
-      [...sb.querySelectorAll('.sb-item')].forEach(el => el.remove());
-      sbhint.style.display = '';
-      cx.clearRect(0, 0, cv.width, cv.height);
-
-      // Restore travel data
-      document.getElementById('tfrom').value = data.travelFrom || '';
-      document.getElementById('tto').value   = data.travelTo   || '';
-      document.getElementById('tmsg').value  = data.travelMsg  || '';
-
-      // Load images
-      let loaded = 0;
-      data.images.forEach((item, i) => {
-        const img = new Image();
-        img.onload = () => {
-          // Create object URL from base64
-          fetch(item.data)
-            .then(r => r.blob())
-            .then(blob => {
-              const url = URL.createObjectURL(blob);
-              imgs[i] = { img, url, name: item.name, question: item.question, solved: false };
-              loaded++;
-              if (loaded === data.images.length) {
-                // sort by original index
-                imgs = imgs.filter(Boolean);
-                renderQueue();
-                renderImgCfg();
-                updateUI();
-                setStatus(`✓ ${imgs.length} Bilder geladen – bereit!`);
-              }
-            });
-        };
-        img.src = item.data;
-        imgs[i] = null; // placeholder to preserve order
-      });
-
-      setupEl.classList.remove('on');
-    } catch(err) {
-      alert('Fehler beim Laden: ' + err.message);
-    }
+function applyFile(file) {
+  const r=new FileReader();
+  r.onload=e=>{
+    try { applyData(JSON.parse(e.target.result)); }
+    catch(err){ alert('Fehler beim Laden: '+err.message); }
   };
-  reader.readAsText(file);
+  r.readAsText(file);
 }
 
-// ── INIT ──────────────────────────────────────────────────────
-updateUI();
+// URL load
+document.getElementById('bloadurl').onclick = () => {
+  let url = document.getElementById('urlinp').value.trim();
+  if (!url) return;
+  url = url.replace('www.dropbox.com','dl.dropboxusercontent.com').replace('?dl=0','?raw=1').replace('?dl=1','?raw=1');
+  const st = document.getElementById('urlst');
+  st.textContent='⏳ Wird geladen …';
+  document.getElementById('bloadurl').disabled=true;
+  fetch(url)
+    .then(r=>{ if(!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+    .then(data=>{ document.getElementById('bloadurl').disabled=false; st.textContent=''; applyData(data); })
+    .catch(err=>{
+      document.getElementById('bloadurl').disabled=false;
+      st.textContent = err.message.includes('fetch') ? '⚠ CORS-Fehler: Raw-Link verwenden.' : `⚠ ${err.message}`;
+    });
+};
+
+function applyData(data) {
+  if (!data||data.v!==1||!Array.isArray(data.images)) { alert('Ungültiges Format.'); return; }
+  imgs.forEach(i=>URL.revokeObjectURL(i.url));
+  imgs=[]; cur=-1; step=0; active=false;
+  bnext.style.display='none'; bskip.style.display='';
+  [...sb.querySelectorAll('.sb-item')].forEach(el=>el.remove());
+  sbhint.style.display='';
+  cx.clearRect(0,0,cv.width,cv.height);
+  dotsEl.classList.remove('visible');
+  document.getElementById('tfrom').value=data.travelFrom||'';
+  document.getElementById('tto').value=data.travelTo||'';
+  document.getElementById('tmsg').value=data.travelMsg||'';
+  let loaded=0;
+  data.images.forEach((item,i)=>{
+    const img=new Image();
+    img.onload=()=>{
+      fetch(item.data).then(r=>r.blob()).then(blob=>{
+        imgs[i]={img, url:URL.createObjectURL(blob), name:item.name, question:item.question, solved:false};
+        if(++loaded===data.images.length){
+          imgs=imgs.filter(Boolean);
+          renderQueue(); renderImgCfg(); syncUI();
+          setStatus(`✓ ${imgs.length} Bilder geladen – bereit!`);
+        }
+      });
+    };
+    img.src=item.data; imgs[i]=null;
+  });
+  setupEl.classList.remove('on');
+}
+
+// ═══════════════════════════════════════════════════
+//  CONFETTI
+// ═══════════════════════════════════════════════════
+function triggerConfetti() {
+  confEl.innerHTML='';
+  for(let i=0;i<72;i++){
+    const p=document.createElement('div'); p.className='pt';
+    const s=5+Math.random()*8;
+    p.style.cssText=`left:${Math.random()*100}%;width:${s}px;height:${s}px;border-radius:${Math.random()>.5?'50% 0':'50%'};background:${PETAL[Math.floor(Math.random()*PETAL.length)]};animation-duration:${1.4+Math.random()*2}s;animation-delay:${Math.random()*.65}s;`;
+    confEl.appendChild(p);
+  }
+  setTimeout(()=>confEl.innerHTML='',4200);
+}
+
+// ═══════════════════════════════════════════════════
+//  UI SYNC
+// ═══════════════════════════════════════════════════
+function setStatus(t) { statusEl.textContent=t; }
+
+function syncUI() {
+  const has = imgs.length > 0;
+  bstart.disabled  = !has || active;
+  breveal.disabled = !active || step >= STEPS.length-1;
+  bguess.disabled  = !active;
+  bskip.disabled   = !active;
+  dz.classList.toggle('hidden', has);
+}
+
+// ═══════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════
+syncUI();
 </script>
 </body>
 </html>
